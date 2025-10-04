@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Make Reservation</title>
+</head>
+<body>
+<h2>Make a Reservation</h2>
+<form action="/reserve" method="post">
+    Passenger: <input type="text" name="passengerName" required><br>
+    Train No: <input type="text" name="trainNumber" required><br>
+    Date: <input type="text" name="journeyDate" placeholder="YYYY-MM-DD" required><br>
+    <button type="submit">Submit</button>
+</form>
+</body>
+</html>

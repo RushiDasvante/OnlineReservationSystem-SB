@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book Ticket</title>
+  <link rel="stylesheet" href="assets/style.css">
+  <style>
+    .container {
+      width: 600px;
+      margin: 50px auto;
+      background: #fff;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    h2 { text-align: center; color: #333; }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    .btn-custom {
+      width: 100%;
+      padding: 10px;
+      background: linear-gradient(to right, #2575fc, #6a11cb);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    .btn-custom:hover { opacity: 0.9; }
+    #book-msg { text-align: center; font-weight: bold; margin-top: 10px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { padding: 8px 12px; border: 1px solid #ccc; text-align: center; }
+    th { background-color: #f2f2f2; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Book Your Ticket</h2>
+
+    <label>Select Train</label>
+    <select id="trainSelect">
+      <option>Loading trains...</option>
+    </select>
+
+    <button class="btn-custom" onclick="toggleTrainTable()">View Trains</button>
+
+    <input type="text" id="passengerName" placeholder="Passenger Name"><br>
+    <input type="number" id="seats" placeholder="Seats"><br>
+    <input type="date" id="dateOfJourney"><br><br>
+    <select id="travelClass">
+      <option value="Sleeper">Sleeper</option>
+      <option value="AC">AC</option>
+      <option value="General">General</option>
+    </select><br><br>
+
+    <button class="btn-custom" onclick="bookTicket()">Book Ticket</button>
+    <p id="book-msg"></p>
+    <br>
+    <button class="btn-custom" onclick="goTo('dashboard.html')">⬅ Back</button>
+
+    <!-- Hidden trains table -->
+    <div id="trainTableContainer" style="display:none;">
+      <h3>Available Trains</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Train No</th>
+            <th>Name</th>
+            <th>From</th>
+            <th>To</th>
+            <th>Seats</th>
+            <th>Fare</th>
+          </tr>
+        </thead>
+        <tbody id="train-list">
+          <!-- Trains will load here -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = "http://localhost:8080/api";
+
+    async function loadTrains() {
+      try {
+        let res = await fetch(`${API_URL}/trains`);
+        if (!res.ok) throw new Error("Failed to fetch trains");
+        let trains = await res.json();
+
+        // Populate dropdown
+        const select = document.getElementById("trainSelect");
+        select.innerHTML = "";
+        trains.forEach(t => {
+          const option = document.createElement("option");
+          option.value = t.trainNumber;
+          option.text = `${t.trainNumber} - ${t.trainName} | ${t.source} → ${t.destination} | ${t.classType} | Seats: ${t.availableSeats}`;
+          select.add(option);
+        });
+
+        // Populate table
+        let html = "";
+        trains.forEach(t => {
+          html += `<tr>
+            <td>${t.trainNumber}</td>
+            <td>${t.trainName}</td>
+            <td>${t.source}</td>
+            <td>${t.destination}</td>
+            <td>${t.availableSeats}</td>
+            <td>₹${t.fare}</td>
+          </tr>`;
+        });
+        document.getElementById("train-list").innerHTML = html;
+
+      } catch (err) {
+        console.error(err);
+        document.getElementById("train-list").innerHTML = "<tr><td colspan='6'>Failed to load trains</td></tr>";
+      }
+    }
+
+    loadTrains();
+
+    // Show/hide trains table
+    function toggleTrainTable() {
+      const container = document.getElementById("trainTableContainer");
+      container.style.display = container.style.display === "none" ? "block" : "none";
+    }
+
+    async function bookTicket() {
+      const trainNumber = document.getElementById("trainSelect").value;
+      const passengerName = document.getElementById("passengerName").value;
+      const seats = document.getElementById("seats").value;
+      const dateOfJourney = document.getElementById("dateOfJourney").value;
+      const travelClass = document.getElementById("travelClass").value;
+
+      if (!trainNumber || !passengerName || !seats || !dateOfJourney) {
+        document.getElementById("book-msg").innerText = "❌ Please fill all fields!";
+        return;
+      }
+
+      const res = await fetch(`${API_URL}/reservations`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ trainNumber, passengerName, seats, dateOfJourney, travelClass })
+      });
+
+      if (res.ok) {
+        document.getElementById("book-msg").innerText = "✅ Ticket booked successfully!";
+        document.getElementById("seats").value = "";
+        document.getElementById("passengerName").value = "";
+        loadTrains(); // refresh dropdown & table
+      } else {
+        const err = await res.text();
+        document.getElementById("book-msg").innerText = "❌ Booking failed: " + err;
+      }
+    }
+
+    function goTo(page) {
+      window.location.href = page;
+    }
+  </script>
+</body>
+</html>

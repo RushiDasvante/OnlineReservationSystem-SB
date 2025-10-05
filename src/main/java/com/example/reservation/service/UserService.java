@@ -7,11 +7,12 @@ import com.example.reservation.repository.UserRepository;
 
 @Service
 public class UserService {
+    
     @Autowired
-    private UserRepository userRepo;
+    private UserRepository userRepository;
 
     public boolean authenticate(String username, String password) {
-        User user = userRepo.findByUsername(username);
-        return user != null && user.getPassword().equals(password);
+        // Find user by username & password
+        return  userRepository.findByUsernameAndPassword(username, password).isPresent();
     }
 }

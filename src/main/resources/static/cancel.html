@@ -3,28 +3,23 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Reservations</title>
+  <title>Cancel Ticket</title>
   <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
   <div class="container">
-    <h2>My Reservations</h2>
-    <table border="1" width="100%">
-      <thead>
-        <tr>
-          <th>Reservation ID</th>
-          <th>PNR</th>
-          <th>Train No</th>
-          <th>Passenger</th>
-          <th>Seats</th>
-          
-        </tr>
-      </thead>
-      <tbody id="reservation-list"></tbody>
-    </table>
+    <h2>Cancel Ticket</h2>
+
+    <input type="text" id="pnr" placeholder="Enter PNR Number"> <br>
+    <br><button class="btn-custom" onclick="cancelReservation()">Cancel Ticket</button>
+
+    <p id="cancel-msg"></p>
+
     <br>
     <button class="btn-custom" onclick="goTo('dashboard.html')">⬅ Back</button>
   </div>
+
   <script src="assets/app.js"></script>
+  
 </body>
 </html>

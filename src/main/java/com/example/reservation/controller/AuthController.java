@@ -1,31 +1,54 @@
 package com.example.reservation.controller;
 
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.reservation.service.UserService;
 
-@Controller
+@RestController
+@RequestMapping("/api/auth")
+@CrossOrigin(origins = "*")
 public class AuthController {
+
     @Autowired
     private UserService userService;
 
-    @GetMapping("/")
-    public String loginPage() {
-        return "login";
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
+        boolean authenticated = userService.authenticate(loginRequest.getUsername(), loginRequest.getPassword());
+        if(authenticated) {
+            // send back JSON with username (or token if JWT implemented)
+            return ResponseEntity.ok(Map.of("username", loginRequest.getUsername()));
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("Invalid Credentials!");
+        }
     }
 
-    @PostMapping("/login")
-    public String login(@RequestParam String username,
-                        @RequestParam String password,
-                        Model model) {
-        if (userService.authenticate(username, password)) {
-            return "redirect:/reservations";
-        } else {
-            model.addAttribute("error", "Invalid Credentials!");
-            return "login";
-        }
+    public static class LoginRequest {
+        private String username;
+        public String getUsername() {
+			return username;
+		}
+		public void setUsername(String username) {
+			this.username = username;
+		}
+		public String getPassword() {
+			return password;
+		}
+		public void setPassword(String password) {
+			this.password = password;
+		}
+		private String password;
+        
+        
+        
+        // getters and setters
     }
 }

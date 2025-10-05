@@ -34,6 +34,7 @@
     }
     .btn-custom:hover { opacity: 0.9; }
     #book-msg { text-align: center; font-weight: bold; margin-top: 10px; }
+    #pnr-display { text-align: center; margin-top: 8px; color: green; font-weight: bold; }
     table { width: 100%; border-collapse: collapse; margin-top: 20px; }
     th, td { padding: 8px 12px; border: 1px solid #ccc; text-align: center; }
     th { background-color: #f2f2f2; }
@@ -61,6 +62,7 @@
 
     <button class="btn-custom" onclick="bookTicket()">Book Ticket</button>
     <p id="book-msg"></p>
+    <p id="pnr-display"></p>
     <br>
     <button class="btn-custom" onclick="goTo('dashboard.html')">⬅ Back</button>
 
@@ -133,32 +135,47 @@
     }
 
     async function bookTicket() {
-      const trainNumber = document.getElementById("trainSelect").value;
-      const passengerName = document.getElementById("passengerName").value;
-      const seats = document.getElementById("seats").value;
-      const dateOfJourney = document.getElementById("dateOfJourney").value;
-      const travelClass = document.getElementById("travelClass").value;
+    	  const trainNumber = document.getElementById("trainSelect").value;
+    	  const passengerName = document.getElementById("passengerName").value;
+    	  const seats = document.getElementById("seats").value;
+    	  const dateOfJourney = document.getElementById("dateOfJourney").value;
+    	  const travelClass = document.getElementById("travelClass").value;
+    	  const username = localStorage.getItem("username"); // match key from login
 
-      if (!trainNumber || !passengerName || !seats || !dateOfJourney) {
-        document.getElementById("book-msg").innerText = "❌ Please fill all fields!";
-        return;
-      }
 
-      const res = await fetch(`${API_URL}/reservations`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ trainNumber, passengerName, seats, dateOfJourney, travelClass })
-      });
+    	  if (!trainNumber || !passengerName || !seats || !dateOfJourney) {
+    	    document.getElementById("book-msg").innerText = "❌ Please fill all fields!";
+    	    return;
+    	  }
 
-      if (res.ok) {
-        document.getElementById("book-msg").innerText = "✅ Ticket booked successfully!";
-        document.getElementById("seats").value = "";
-        document.getElementById("passengerName").value = "";
-        loadTrains(); // refresh dropdown & table
-      } else {
-        const err = await res.text();
-        document.getElementById("book-msg").innerText = "❌ Booking failed: " + err;
-      }
+    	  const res = await fetch(`${API_URL}/reservations?username=${username}`, { // send username as query param
+    	    method: "POST",
+    	    headers: { "Content-Type": "application/json" },
+    	    body: JSON.stringify({ trainNumber, passengerName, seats, dateOfJourney, travelClass })
+    	  });
+
+    	  if (res.ok) {
+    	    const data = await res.json(); // backend should return reservation with PNR
+    	    document.getElementById("book-msg").innerText = "✅ Ticket booked successfully!";
+    	    document.getElementById("pnr-display").innerText = "Your PNR: " + (data.pnr || generatePNR());
+
+    	    // Clear fields
+    	    document.getElementById("seats").value = "";
+    	    document.getElementById("passengerName").value = "";
+    	    document.getElementById("dateOfJourney").value = "";
+    	    document.getElementById("travelClass").selectedIndex = 0;
+
+    	    loadTrains(); // refresh dropdown & table
+    	  } else {
+    	    const err = await res.text();
+    	    document.getElementById("book-msg").innerText = "❌ Booking failed: " + err;
+    	    document.getElementById("pnr-display").innerText = "";
+    	  }
+    	}
+
+    // Local fallback PNR generator (if backend doesn't send one)
+    function generatePNR() {
+      return "PNR" + Math.floor(Math.random() * 1000000000);
     }
 
     function goTo(page) {

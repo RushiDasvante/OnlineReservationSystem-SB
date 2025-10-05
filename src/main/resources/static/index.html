@@ -4,10 +4,72 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login - Online Reservation System</title>
-  <link rel="stylesheet" href="assets/style.css">
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+	  background-image: url('assets/train.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.9); /* semi-transparent white box */
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+      width: 350px;
+      text-align: center;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    .btn-custom {
+      width: 100%;
+      padding: 10px;
+      background: linear-gradient(to right, #2575fc, #6a11cb);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 10px;
+    }
+
+    .btn-custom:hover {
+      opacity: 0.9;
+    }
+
+    h1 {
+      margin-bottom: 10px;
+      color: #333;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      color: #555;
+    }
+
+    #login-msg {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+  </style>
 </head>
 <body>
   <div class="container">
+    <h1>Online Train Reservation System</h1>
     <h2>Login</h2>
     <input type="text" id="username" placeholder="Enter Username" class="form-control"><br>
     <input type="password" id="password" placeholder="Enter Password" class="form-control"><br>

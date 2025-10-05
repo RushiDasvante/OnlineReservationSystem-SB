@@ -1,6 +1,8 @@
 package com.example.reservation.model;
 
 import java.time.LocalDate;
+import java.util.Random;
+import java.util.UUID;
 
 import jakarta.persistence.*;
 
@@ -20,15 +22,52 @@ public class Reservation {
     private String trainName;
     private String source;
     private String destination;
-    
-    
+   
+
+	private String username;
+    @Column(unique = true)
+    private String pnr;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    // getters & setters
+    public User getUser() { return user; }
+    public void setUser(User user) { this.user = user; }
+
+	public Reservation() {
+        // generate random 6-digit alphanumeric PNR on creation
+        this.pnr = generatePNR();
+    }
+	 public String getUsername() {
+			return username;
+		}
+		public void setUsername(String username) {
+			this.username = username;
+		}
+
+	public String getPnr() {
+		return pnr;
+	}
 
 
-    public Reservation() {}
 
+	public void setPnr(String pnr) {
+		this.pnr = pnr;
+	}
+   
+    private String generatePNR() {
+    	String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        StringBuilder sb = new StringBuilder();
+        Random random = new Random();
+        for (int i = 0; i < 6; i++) {
+            sb.append(chars.charAt(random.nextInt(chars.length())));
+        }
+        return sb.toString();
+    }
     public Reservation(String passengerName, int seats, String dateOfJourney,
                        String travelClass, String trainNumber, String trainName,
-                       String source, String destination) {
+                       String source, String destination,String username) {
         this.passengerName = passengerName;
         this.seats = seats;
         this.dateOfJourney = dateOfJourney;
@@ -37,6 +76,8 @@ public class Reservation {
         this.trainName = trainName;
         this.source = source;
         this.destination = destination;
+        this.username=username;
+        this.pnr=generatePNR();
     }
 
 	public Long getId() {

@@ -7,6 +7,7 @@ The system allows users to:
 - **Book tickets** for available trains.
 - **View train schedules** and details.
 - **Check their reservations**.
+- **Cancel Your Reservation Using PNR Number**.
 - **Login** to access personalized features.
 
 This project demonstrates a full-stack approach with backend logic in Spring Boot and frontend using HTML, CSS, and JavaScript.
